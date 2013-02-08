@@ -2,3 +2,4 @@
 *.pot
 *.pyc
 .ropeproject
+_build

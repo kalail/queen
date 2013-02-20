@@ -51,7 +51,7 @@ class Parser(object):
 		return parsed_msg
 
 
-	def to_string(self, msg_vars):
+	def compose(self, msg_vars):
 		"""Return a string containing the given message variables."""
 
 		# Make sure keys are the same

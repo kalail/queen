@@ -22,8 +22,12 @@ DRONES = [
 	'test',
 ]
 
-SERIAL_DEVICE = 'dev/tty0'
-SERIAL_BAUD = 9600
+SERIAL = {
+	'DEVICE': 'dev/tty0',
+	'BAUD': 9600,
+	'TIMEOUT': 2.0,
+	'WRITE_TIMEOUT': 2.0,
+}
 
 PACKET_STRUCTURE = {
 	'TO_LENGTH': 1,
@@ -34,3 +38,9 @@ PACKET_STRUCTURE = {
 }
 
 MESSAGES = messages
+
+RASPBERRY_PI = {
+	'ip': '108.84.166.27',
+}
+
+QUEEN_ID = 1

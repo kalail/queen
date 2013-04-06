@@ -13,7 +13,6 @@ from .parser import Parser
 from .codec import Codec, Packet
 from .link import Link
 
-
 class Communication(object):
 	"""Communication
 

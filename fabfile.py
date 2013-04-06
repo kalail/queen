@@ -2,7 +2,7 @@ from fabric.api import *
 
 
 env.hosts = [
-	'108.84.166.27'
+	'192.168.1.144'
 ]
 env.user = 'pi'
 

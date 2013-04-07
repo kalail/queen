@@ -12,31 +12,36 @@ The Queen bot is part of the *swarm* system which is described below.
 Architecture
 ------------
 
-The Swarm system is designed to easily implement high level multi-node logic in robot networks where individual node behaviour can be described by a low-state-count state machine.
+The Swarm system is designed to implement high level multi-node logic in a robot network where individual node behaviour can be described by a low-state-count state machine.
 
 It is comprised of the following elements:
 
 - **Drone**
-	A psuedo-dumb bot. It implements a simple state machine managing appropriate hardware resources.
+	A low-memory, integrated-cpu bot. It implements a simple state machine and manages hardware resources.
 
 - **Queen**
-	Smart bot that decides *Drone* state machine transitions and can run arbritrary code.
+	Bot running on a fast-cpu with no practical memory restrictions. It is the only central authority and decides *Drone* state machine transitions.
 
 - **Swarm**
-	A network of at most 1 queen bot and infinite drone bots over a singular communication bus. 
+	A network of 1 queen bot and any number drone bots over a singular communication bus.
 
 Protocol
 --------
 
-The **Queen** periodically sends out the *ready packet* when it is free.
+The **Queen** process is started and immediately goes to sleep for 2 seconds.
 
-**Drones** send the *basic packet* when they recieve the *ready packet*.
+The **Drones** are started. Each immediately connect to the **swarm** and wait for the *Heartbeat*.
 
-The **Queen** recieves the first response and converses with the **Drone** using *command* and *info packets*.
+The **Queen** wakes up and sends out the *Heartbeat*.
 
-Once the conversation is finished, the **Queen** will broadcast the *ready packet*.
+Any **Drone** that recieves the *Heartbeat* responds with a *Pulse* containing it's up-to-date *DroneState*.
 
-A **Drone** will not respond to consecutive *ready packets*.
+The **Queen** processes all *Pulse* messages and creates a *ContestState*. It then sends all **Drones** individual *Commands*.
+
+**Drones** perform routines based on recieved *Commands* and then listen for the *Heartbeat* when done.
+
+The **Queen** and the drones then repeat this cycle starting with the queen sending the *Heartbeat* and updating the *ContestState* every iteration.
+
 
 
 Contents:

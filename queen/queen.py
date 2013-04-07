@@ -26,21 +26,21 @@ class SwarmState(object):
 		self.new = True
 
 
-def drone_loop(shared, msg):
+def drone_loop(shared, msg, send_message_queue):
 	print 'Processing drone loop'
 	time.sleep(0.2)
 	cmd_msg = comms.Message(to_id=6, from_id=1, type_id=5, payload='GARBAGE')
-	shared.send_message_queue.put(cmd_msg)
+	send_message_queue.put(cmd_msg)
 
 	
-def heartbeat_loop(link, pool, shared):
+def heartbeat_loop(link, pool, shared, send_message_queue):
 	# Create waitlist from updated list of active drones
 	waitlist = list(shared.swarm.drones)
 	print 'waitlist: %s' % (waitlist,)
 	# Send heartbeat
 	print 'Sending heartbeat'
 	heartbeat = comms.Message(to_id=0, from_id=1, type_id=0, payload='HEARTBEAT')
-	shared.send_message_queue.put(heartbeat)
+	send_message_queue.put(heartbeat)
 	while True:
 		# Wait for msg
 		message = link.read_message()
@@ -54,15 +54,15 @@ def heartbeat_loop(link, pool, shared):
 		if drone_id in waitlist:
 			waitlist.remove(drone_id)
 			print 'Processing drone ID %s' & (drone_id,)
-			pool.apply_async(drone_loop, [shared, message])
+			pool.apply_async(drone_loop, [shared, message, send_message_queue])
 		if not waitlist:
 			print 'Waitlist empty'
 			break
 
-def process_message_queue(shared, link):
+def process_message_queue(link, shared, send_message_queue):
 	print 'Started message send process'
 	while True:
-		msg = shared.send_message_queue.get()
+		msg = send_message_queue.get()
 		if not msg:
 			print 'Quitting message send process'
 			break
@@ -78,13 +78,13 @@ def main_routine(link, swarm):
 	shared = helpers.setup_shared_memory()
 	shared.swarm = swarm
 	# Create message send process
-	shared.send_message_queue = multiprocessing.Queue()
-	send_message_process = multiprocessinging.Process(target=process_message_queue, args=[shared, link])
+	send_message_queue = multiprocessing.Queue()
+	send_message_process = multiprocessinging.Process(target=process_message_queue, args=[link, shared, send_message_queue])
 	send_message_process.start()
 	# Start heartbeat loop
 	while True:
 		start_time = time.time()
-		heartbeat_loop(link, pool, shared)
+		heartbeat_loop(link, pool, shared, send_message_queue)
 		time_delta = time.time() - start_time
 		# Sleep
 		sleep_for = 1.0 - time_delta

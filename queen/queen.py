@@ -26,12 +26,16 @@ class SwarmState(object):
 		self.new = True
 
 
-def drone_loop(shared, msg):
-	print 'Drone loop ' + str(msg.from_id)
-	return 'Finished'
+def drone_loop(link, shared, msg):
+	print 'Processing drone loop'
+	time.sleep(0.2)
+	cmd_msg = comms.Message(to_id=6, from_id=1, type_id=5, payload='GARBAGE')
+	return link, cmd_msg
 
-def drone_finish(result):
-	print result
+
+def drone_loop_callback(link, msg):
+	print 'Sending message from callback'
+	link.send_message(msg)
 
 def heartbeat_loop(link, pool, shared):
 	# Create waitlist from updated list of active drones
@@ -49,9 +53,10 @@ def heartbeat_loop(link, pool, shared):
 		drone_id = message.from_id
 		if drone_id in waitlist:
 			waitlist.remove(drone_id)
-			pool.apply_async(drone_loop, [shared, message], callback=drone_finish)
+			pool.apply_async(drone_loop, [shared, message], callback=drone_loop_callback)
 		if not waitlist:
 			break
+
 
 def queen_loop(link, swarm):
 	# Setup Process pool
@@ -63,8 +68,11 @@ def queen_loop(link, swarm):
 	shared.swarm = swarm
 	# Start heartbeat loop
 	while True:
+		start_time = time.time()
 		heartbeat_loop(link, pool, shared)
-
+		time_delta = time.time() - start_time
+		# Sleep
+		time.sleep(1.0 - time_delta)
 
 if __name__ == '__main__':
 	# TODO: CLI arguments

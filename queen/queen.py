@@ -23,6 +23,47 @@ class SwarmState(object):
 	def __init__(self, name):
 		self.name = name
 		self.drones = []
+		self.new = True
+
+
+def drone_loop(shared, msg):
+	print 'Drone loop ' + str(msg.from_id)
+	return 'Finished'
+
+def drone_finish(result):
+	print result
+
+def heartbeat_loop(link, pool, shared):
+	# Create waitlist from updated list of active drones
+	waitlist = shared.swarm.drones
+	# Send heartbeat
+	heartbeat = comms.Message(to_id=0, from_id=1, type_id=0, payload='HEARTBEAT')
+	link.send_message(heartbeat)
+	while True:
+		# Wait for msg
+		message = link.read_message()
+		# Check for timeout
+		if not message:
+			break
+		# extract drone id
+		drone_id = message.from_id
+		if drone_id in waitlist:
+			waitlist.remove(drone_id)
+			pool.apply_async(drone_loop, [shared, message], callback=drone_finish)
+		if not waitlist:
+			break
+
+def queen_loop(link, swarm):
+	# Setup Process pool
+	print 'Spinning up process pool'
+	pool = multiprocessing.Pool(processes=len(swarm.drones))
+	print 'Creating shared memory'
+	# Setup shared memory
+	shared = helpers.setup_shared_memory()
+	shared.swarm = swarm
+	# Start heartbeat loop
+	while True:
+		heartbeat_loop(link, pool, shared)
 
 
 if __name__ == '__main__':
@@ -40,9 +81,6 @@ if __name__ == '__main__':
 	print 'Getting list of active drones'
 	swarm.drones = helpers.get_active_drones(link)
 	print 'Recieved drones: %s' % (swarm.drones,)
-	# Setup Process pool
-	print 'Spinning up process pool'
-	pool = multiprocessing.Pool(processes=len(swarm.drones))
-	print 'Setup complete'
-	# Start heartbeat loop
-	
+	print 'Startup complete'
+	# Start Queen loop
+	queen_loop(link, swarm)

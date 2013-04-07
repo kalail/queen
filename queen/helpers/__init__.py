@@ -1,5 +1,5 @@
-import serial
 import communication
+import multiprocessing
 
 # def get_active_drones():
 # 	port = serial.Serial('/dev/ttyUSB0', 9600, timeout=2)
@@ -29,3 +29,8 @@ def get_active_drones(link):
 	# Create list of drones
 	drones = [msg.from_id for msg in messages]
 	return drones
+
+def setup_shared_memory():
+	manager = multiprocessing.Manager()
+	shared = manager.Namespace()
+	return shared

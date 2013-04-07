@@ -53,7 +53,7 @@ def heartbeat_loop(link, pool, shared, send_message_queue):
 		drone_id = message.from_id
 		if drone_id in waitlist:
 			waitlist.remove(drone_id)
-			print 'Processing drone ID %s' & (drone_id,)
+			print 'Dispatching routing for drone ID %s' % (drone_id,)
 			pool.apply_async(drone_loop, [shared, message, send_message_queue])
 		if not waitlist:
 			print 'Waitlist empty'
@@ -66,7 +66,7 @@ def process_message_queue(link, shared, send_message_queue):
 		if not msg:
 			print 'Quitting message send process'
 			break
-		print 'Recieved message'
+		print 'Sending queued message'
 		link.send_message(msg)
 
 def main_routine(link, swarm):

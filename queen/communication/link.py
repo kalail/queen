@@ -1,103 +1,87 @@
-import queen.settings as settings
 import serial
-
-from .parser import Parser
-from .codec import Codec, Packet
+from .messages import Message
 
 
 class Link(object):
 	"""Link
 
-	A link between the queen and a drone. It maintains state information and
+	Link between the queen and the swarm. It maintains state information and
 	implements messaging functionality.
-
-
-	Available methods:
-
-		send_message(msg, drone_id)
-		Sends a string *msg* to drone with id *drone_id*.
-		Returns ``True`` if the message is successfully delivered.
-
-		ping(drone_id)
-		Attepts to ping the drone with id *drone_id*.
-		Returns ``True`` if the drone is available.
 
 	"""
 
-	def __init__(self, communication, drone_id):
-		self.id = drone_id
-		self.active = False
-		self.communication = communication
+	def __init__(self):
+		self.port = serial.Serial('/dev/ttyUSB0', 9600, timeout=2)
+		self.active = True
 
-	
-	# params = {
-	# 	'startup_delay': 10,
-	# }
-	def send_message(self, msg_name, params):
+
+	def send_message(self, msg):
 		"""Send message
 
 		Transmit a message with given parameters through the link.
 
-		e.g.
-
-			send_message('CreateLink', {
-					'startup_delay': 10
-				}
-			)
-
 		"""
-		comms = self.communication
-		# Create message
-		p = comms.get_parser(msg_name)
-		msg_string = p.compose(params)
-		# Create packet
-		packet = Packet(self.id, settings.QUEEN_ID, p.msg_id, msg_string)
-		c = comms.codec
-		packet_string = c.encode(packet)
+		# Convert message
+		string = str(msg)
 		# Write serial
-		self.write(packet_string)
+		self.__send_string(string)
 		
 
-	def write(self, string):
-		"""Write
+	def __send_string(self, string):
+		"""Send String
 
-		Write *string* into the associated comms module serial port.
+		Write *string* into the associated port.
 
 		"""
-		comms = self.communication
-		port = comms.serial
+		# Try to write string
 		try:
-			num_bytes = port.write(string)
-
+			num_bytes = self.port.write(string)
+		# Catch timeout
 		except serial.SerialTimeoutException:
-			print 'Error: timeout in link.write'
-
+			print 'Error: timeout writing to port.'
+		# Check if expected number of bytes were written
 		else:
-			# Check if expected number of bytes were written
-			if num_bytes == len(string):
-				return
-		
-		# Rescue link if timeout or incorrect number of bytes written.
-		self.rescue()
-		self.write(string)
+			if num_bytes != len(string):
+				print 'Error: Mismatch in number of bytes written to port.'
 
 
-	def read(self):
-		# INCOMPLETE
-		comms = self.communication
-		port = comms.serial
-		try:
-			port.readline(eol=settings.PACKET_STRUCTURE['TERMINATOR'])
-		except serial.SerialTimeoutException:
-			pass
+	def __read_string(self):
+		"""Read String - Blocks!
+
+		Reads and returns a string if one is recieved.
+
+		"""
+		string = self.port.readline()
+		return string
 
 
-	def rescue(self):
-		self.communication.reset_serial()
+	def read_message(self):
+		"""Read Message - Blocks!
+
+		Parses a string, if recieved, and returns a message.
+
+		"""
+		# Get string
+		string = self.__read_string()
+		# Check for timeout
+		if not string:
+			return None
+		msg = Message(string=string)
+		return msg
 
 
-	def ping(self):
-		raise NotImplementedError
+	def close(self):
+		"""Close
 
-	def teardown(self):
-		pass
+		Proper close method. must be called manually.
+
+		"""
+		self.port.close()
+		del self.port
+		self.active = False
+
+
+	def __del__(self):
+		"""Memory Destructor - Not always called"""
+
+		self.close()

@@ -2,7 +2,7 @@ import serial
 
 def get_active_drones():
 	port = serial.Serial('/dev/ttyUSB0', 9600, timeout=2)
-	port.write('0;1;0;GabeIsADick!\n')
+	port.write('0;1;0;heartbeat\n')
 	drones = []
 	
 	msg = port.readline()

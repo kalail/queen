@@ -8,27 +8,48 @@ Creates the majestic queen bot.
 		None
 
 """
-# import helpers
 import time
 import communication as comms
+import helpers
+import multiprocessing
 
-if __name__ == '__main__':
+class SwarmState(object):
+	"""Swarm State
+
+	Represents the current state of the swarm. Used to make all decisions and must be passed to many methods.
+
+	"""
+	pass
+
+def setup(swarm):
+	"""Setup
+
+	Perform the Queen swarm setup.
+
+	"""
 	# Sleep for 2 seconds
-	# TODO: Make CLI argument
+	print 'Sleeping for 2 seconds'
 	time.sleep(2)
 	# Setup link
-	link = comms.Link()
-	send_msg = comms.Message(to_id=0, from_id=1, type_id=0, payload='HEATRTBEAT')
-	send_msg_lost = comms.Message(to_id=7, from_id=1, type_id=8, payload='HEATRTBEAT')
-	while True:
-		link.send_message(send_msg)
-		link.send_message(send_msg_lost)
-		rec_msg = link.read_message()
-		print rec_msg.from_id
-		link.send_message(send_msg_lost)
-		# time.sleep(1)
-	# Send heartbeat
-	# Serially read responding drones
-	# Record time
+	swarm.link = comms.Link(read_timeout=2)
+	print 'Link setup'
+	now = time.time()
+	# Get list of active drones - Blocking
+	swarm.drones = helpers.get_active_drones(swarm.link)
+	time_taken = time.time() - now
+	print 'Recieved drones: %s' % (swarm.drones,)
+	print 'Time taken: %s' % (time_taken,)
 	# Setup Process pool
+	swarm.pool = multiprocessing.Pool(processes=len(swarm.drones))
+
+
+if __name__ == '__main__':
+	# TODO: CLI arguments
+	# Startup routine
+	print 'Performing Queen startup routine'
+	# Create swarm object
+	swarm = SwarmState()
+	# Perform queen swarm setup
+	setup(swarm)
+	import pdb; pdb.set_trace()
 	# Start heartbeat loop

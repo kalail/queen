@@ -23,7 +23,7 @@ if __name__ == '__main__':
 		link.send_message(send_msg)
 		rec_msg = link.read_message()
 		print rec_msg.from_id
-		time.sleep(1)
+		# time.sleep(1)
 	# Send heartbeat
 	# Serially read responding drones
 	# Record time

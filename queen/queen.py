@@ -85,8 +85,11 @@ def main_routine(link, swarm):
 		start_time = time.time()
 		heartbeat_loop(link, pool, shared, send_message_queue)
 		time_delta = time.time() - start_time
-		# Sleep
+		# Time loop
 		sleep_for = 1.0 - time_delta
+		# Check if need to sleep
+		if sleep_for < 0:
+			continue
 		print 'Sleeping for %s' % (sleep_for,)
 		time.sleep(sleep_for)
 

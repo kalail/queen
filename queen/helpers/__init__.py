@@ -26,6 +26,7 @@ def get_active_drones(link):
 			break
 		# Add to messages
 		messages.append(message)
+		print 'Recieved: %s' % (message,)
 	# Create list of drones
 	drones = [msg.from_id for msg in messages]
 	return drones

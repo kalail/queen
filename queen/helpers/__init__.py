@@ -30,7 +30,8 @@ def get_active_drones(link):
 	drones = [msg.from_id for msg in messages]
 	return drones
 
-def setup_shared_memory():
+def setup_shared_memory_and_queue():
 	manager = multiprocessing.Manager()
 	shared = manager.Namespace()
-	return shared
+	queue = manager.Queue()
+	return shared, queue

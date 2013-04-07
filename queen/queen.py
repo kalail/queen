@@ -53,7 +53,7 @@ def heartbeat_loop(link, pool, shared, send_message_queue):
 		drone_id = message.from_id
 		if drone_id in waitlist:
 			waitlist.remove(drone_id)
-			print 'Dispatching routing for drone ID %s' % (drone_id,)
+			print 'Dispatching routine for drone ID %s' % (drone_id,)
 			pool.apply_async(drone_loop, [shared, message, send_message_queue])
 		if not waitlist:
 			print 'Waitlist empty'
@@ -75,10 +75,9 @@ def main_routine(link, swarm):
 	pool = multiprocessing.Pool(processes=len(swarm.drones) + 1)
 	print 'Creating shared memory'
 	# Setup shared memory
-	shared = helpers.setup_shared_memory()
+	shared, send_message_queue = helpers.setup_shared_memory_and_queue()
 	shared.swarm = swarm
 	# Create message send process
-	send_message_queue = multiprocessing.Queue()
 	send_message_process = multiprocessing.Process(target=process_message_queue, args=[link, shared, send_message_queue])
 	send_message_process.start()
 	# Start heartbeat loop

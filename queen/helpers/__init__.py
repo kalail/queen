@@ -1,17 +1,18 @@
 import communication
 import multiprocessing
+import serial
 
-# def get_active_drones():
-# 	port = serial.Serial('/dev/ttyUSB0', 9600, timeout=2)
-# 	send_msg = '0;1;0;heartbeat\n'
-# 	port.write(send_msg)
-# 	drones = []
-# 	msg = port.readline()
-# 	if not msg:
-# 		return None
-# 	drone_id = msg[2]
-# 	drones.append(drone_id)
-# 	return drones
+def simple_heartbeat():
+	port = serial.Serial('/dev/ttyUSB0', 9600, timeout=2)
+	send_msg = '0;1;0;HEARTBEAT\n'
+	port.write(send_msg)
+	messages = []
+	while True:
+		msg = port.readline()
+		if not msg:
+			break
+		messages.append(msg)
+	return messages
 
 def get_active_drones(link):
 	messages = []

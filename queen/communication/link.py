@@ -10,8 +10,8 @@ class Link(object):
 
 	"""
 
-	def __init__(self):
-		self.port = serial.Serial('/dev/ttyUSB0', 9600, timeout=2)
+	def __init__(self, read_timeout=None, write_timeout=None):
+		self.port = serial.Serial('/dev/ttyUSB0', 9600, timeout=read_timeout, writeTimeout=write_timeout)
 		self.active = True
 
 

@@ -14,7 +14,7 @@ def get_active_drones():
 	return drones
 
 def get_active_drones_new():
-	link = communication.Link()
+	link = communication.Link(read_timeout=2)
 	send_msg = communication.Message(to_id=0, from_id=1, type_id=0, payload='HEATRTBEAT')
 	link.send_message(send_msg)
 	drones = []

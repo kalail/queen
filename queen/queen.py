@@ -30,13 +30,9 @@ def drone_loop(link, shared, msg):
 	print 'Processing drone loop'
 	time.sleep(0.2)
 	cmd_msg = comms.Message(to_id=6, from_id=1, type_id=5, payload='GARBAGE')
-	return link, cmd_msg
+	link.send_message(cmd_msg)
 
-
-def drone_loop_callback(link, msg):
-	print 'Sending message from callback'
-	link.send_message(msg)
-
+	
 def heartbeat_loop(link, pool, shared):
 	# Create waitlist from updated list of active drones
 	waitlist = shared.swarm.drones
@@ -53,7 +49,7 @@ def heartbeat_loop(link, pool, shared):
 		drone_id = message.from_id
 		if drone_id in waitlist:
 			waitlist.remove(drone_id)
-			pool.apply_async(drone_loop, [shared, message], callback=drone_loop_callback)
+			pool.apply_async(drone_loop, [shared, message])
 		if not waitlist:
 			break
 

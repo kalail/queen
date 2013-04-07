@@ -10,9 +10,11 @@ env.user = 'pi'
 def prepare_raspberry_pi():
 	pass
 
-def pull():
+def remote_pull():
 	with cd('virtualenvs/queen/queen'):
 		run('git pull')
 
 def deploy():
-	pass
+	local('git commit -a')
+	local('git push origin')
+	remote_pull()

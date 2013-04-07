@@ -79,7 +79,7 @@ def main_routine(link, swarm):
 	shared.swarm = swarm
 	# Create message send process
 	send_message_queue = multiprocessing.Queue()
-	send_message_process = multiprocessinging.Process(target=process_message_queue, args=[link, shared, send_message_queue])
+	send_message_process = multiprocessing.Process(target=process_message_queue, args=[link, shared, send_message_queue])
 	send_message_process.start()
 	# Start heartbeat loop
 	while True:

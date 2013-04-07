@@ -3,7 +3,13 @@ import re
 class Message(object):
 	"""Message
 
-	Base message object with a 'to' and 'from' field.
+	Basic message communication object.
+
+	Attributes
+		-to_id
+		-from_id
+		-type_id
+		-payload
 
 	"""
 	def __init__(self, string=None, **kwargs):
@@ -39,6 +45,8 @@ class Message(object):
 		string = '%s;%s;%s;%s\n' % (self.to_id, self.from_id, self.type_id, self.payload)
 		return string
 
+# OLD
+# 
 # messages = (
 # 	{
 # 		# 0

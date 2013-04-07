@@ -19,10 +19,13 @@ if __name__ == '__main__':
 	# Setup link
 	link = comms.Link()
 	send_msg = comms.Message(to_id=0, from_id=1, type_id=0, payload='HEATRTBEAT')
+	send_msg_lost = comms.Message(to_id=7, from_id=1, type_id=8, payload='HEATRTBEAT')
 	while True:
 		link.send_message(send_msg)
+		link.send_message(send_msg_lost)
 		rec_msg = link.read_message()
 		print rec_msg.from_id
+		link.send_message(send_msg_lost)
 		# time.sleep(1)
 	# Send heartbeat
 	# Serially read responding drones

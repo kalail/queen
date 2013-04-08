@@ -115,10 +115,7 @@ if __name__ == '__main__':
 	# TODO: CLI arguments
 	# Startup routine
 	print 'Performing Queen setup'
-	swarm = SwarmState('TheFirstSwarm 9182 123.73 x')
-	# Sleep for 2 seconds
-	print 'Sleeping for 2 seconds'
-	time.sleep(2)
+	swarm = SwarmState('TheFirstSwarm')
 	# Setup link
 	link = comms.Link(read_timeout=2)
 	print 'Set up link to swarm'

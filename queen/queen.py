@@ -78,7 +78,7 @@ def process_message_queue(link, shared, send_message_queue):
 def main_routine(link, swarm):
 	# Setup Process pool
 	print 'Spinning up process pool'
-	pool = multiprocessing.Pool(processes=len(swarm.drones) + 1)
+	pool = multiprocessing.Pool(len(swarm.drones) + 1, helpers.initialize_worker)
 	print 'Creating shared memory'
 	# Setup shared memory
 	shared, send_message_queue = helpers.setup_shared_memory_and_queue()
@@ -87,17 +87,25 @@ def main_routine(link, swarm):
 	send_message_process = multiprocessing.Process(target=process_message_queue, args=[link, shared, send_message_queue])
 	send_message_process.start()
 	# Start heartbeat loop
-	while True:
-		start_time = time.time()
-		heartbeat_loop(link, pool, shared, send_message_queue)
-		time_delta = time.time() - start_time
-		# Time loop
-		sleep_for = 1.0 - time_delta
-		# Check if need to sleep
-		if sleep_for < 0:
-			continue
-		print 'Sleeping for %s' % (sleep_for,)
-		time.sleep(sleep_for)
+	try:
+		while True:
+			start_time = time.time()
+			heartbeat_loop(link, pool, shared, send_message_queue)
+			time_delta = time.time() - start_time
+			# Time loop
+			sleep_for = 1.0 - time_delta
+			# Check if need to sleep
+			if sleep_for < 0:
+				continue
+			print 'Sleeping for %s' % (sleep_for,)
+			time.sleep(sleep_for)
+	except KeyboardInterrupt:
+		print 'Caught SIGINT, shutting down'
+	finally:
+		print 'Shutting down process pool'
+		pool.terminate()
+		pool.join()
+		print 'Shutting down main process'
 
 if __name__ == '__main__':
 	# TODO: CLI arguments

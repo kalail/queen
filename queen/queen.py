@@ -27,11 +27,17 @@ class SwarmState(object):
 
 
 def drone_loop(shared, msg, send_message_queue):
-	print 'Processing drone loop'
-	time.sleep(0.2)
+	start_time = time.time()
+	print 'Processing drone %s' % msg.from_id
+	payload = msg.payload
+	params = payload.split(',')
+	print 'State ID: %s' % params[0]
+	print 'Free Memory: %s' % params[1]
 	cmd_msg = comms.Message(to_id=6, from_id=1, type_id=5, payload='GARBAGE')
 	send_message_queue.put(cmd_msg)
-
+	# Time process
+	time_delta = time.time() - start_time
+	print time_delta
 	
 def heartbeat_loop(link, pool, shared, send_message_queue):
 	# Create waitlist from updated list of active drones
@@ -39,7 +45,7 @@ def heartbeat_loop(link, pool, shared, send_message_queue):
 	print 'waitlist: %s' % (waitlist,)
 	# Send heartbeat
 	print 'Sending heartbeat'
-	heartbeat = comms.Message(to_id=0, from_id=1, type_id=0, payload='')
+	heartbeat = comms.Message(to_id=0, from_id=1, type_id=1, payload='')
 	send_message_queue.put(heartbeat)
 	while True:
 		# Wait for msg

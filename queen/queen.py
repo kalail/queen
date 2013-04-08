@@ -135,5 +135,4 @@ if __name__ == '__main__':
 	finally:
 		print 'Shutting down process pool'
 		pool.join()
-		print 'Shutting down shared_memory'		
 		print 'Shutting down main process'

@@ -101,9 +101,13 @@ def main_routine(link, swarm):
 			time.sleep(sleep_for)
 	except KeyboardInterrupt:
 		print 'Caught SIGINT, shutting down'
+		# Kill pool
+		pool.terminate()
+	else:
+		# Tell pool to finish
+		pool.close()
 	finally:
 		print 'Shutting down process pool'
-		pool.terminate()
 		pool.join()
 		print 'Shutting down main process'
 

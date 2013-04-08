@@ -39,7 +39,7 @@ def heartbeat_loop(link, pool, shared, send_message_queue):
 	print 'waitlist: %s' % (waitlist,)
 	# Send heartbeat
 	print 'Sending heartbeat'
-	heartbeat = comms.Message(to_id=0, from_id=1, type_id=0, payload='HEARTBEAT')
+	heartbeat = comms.Message(to_id=0, from_id=1, type_id=0, payload='')
 	send_message_queue.put(heartbeat)
 	while True:
 		# Wait for msg

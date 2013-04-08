@@ -14,7 +14,14 @@ def remote_pull():
 	with cd('virtualenvs/queen/queen'):
 		run('git pull')
 
-def deploy():
+def commit():
 	local('git commit -a')
+
+def push():
 	local('git push origin')
+	
+
+def deploy():
+	commit()
+	push()
 	remote_pull()

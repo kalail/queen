@@ -17,7 +17,7 @@ def simple_heartbeat():
 def get_active_drones(link):
 	messages = []
 	# Send heartbeat
-	heartbeat = communication.Message(to_id=0, from_id=1, type_id=0, payload='The First Swarm')
+	heartbeat = communication.Message(to_id=0, from_id=1, type_id=0, payload='TheFirstSwarm 9182 123.73 x')
 	link.send_message(heartbeat)
 	# Read mesages until timeout
 	while True:

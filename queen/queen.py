@@ -30,7 +30,7 @@ def drone_loop(shared, msg, send_message_queue):
 	start_time = time.time()
 	print 'Processing drone %s' % msg.from_id
 	payload = msg.payload
-	params = payload.split(',')
+	params = payload.split(' ')
 	print 'State ID: %s' % params[0]
 	print 'Free Memory: %s' % params[1]
 	cmd_msg = comms.Message(to_id=6, from_id=1, type_id=5, payload='GARBAGE')
@@ -103,7 +103,7 @@ if __name__ == '__main__':
 	# TODO: CLI arguments
 	# Startup routine
 	print 'Performing Queen setup'
-	swarm = SwarmState('The First Swarm')
+	swarm = SwarmState('TheFirstSwarm 9182 123.73 x')
 	# Sleep for 2 seconds
 	print 'Sleeping for 2 seconds'
 	time.sleep(2)

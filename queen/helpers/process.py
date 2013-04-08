@@ -1,5 +1,6 @@
 import signal
 
+
 def initialize_worker():
 	"""Initialize Worker
 

@@ -26,27 +26,35 @@ class SwarmState(object):
 		self.new = True
 
 
-def drone_loop(shared, msg, send_message_queue):
+def drone_loop(swarm, msg, message_queue):
+	print 'Processing drone ID %s' % msg.from_id
 	start_time = time.time()
-	print 'Processing drone %s' % msg.from_id
+	# Extract payload
 	payload = msg.payload
 	params = payload.split(',')
-	print 'State ID: %s' % params[0]
-	print 'Free Memory: %s' % params[1]
-	cmd_msg = comms.Message(to_id=6, from_id=1, type_id=5, payload='GARBAGE')
-	send_message_queue.put(cmd_msg)
+	print params
+	# Update swarm
+	swarm_key = 'drone_%s' % msg.from_id
+	swarm[swarm_key] = params[0]
+	# print 'State ID: %s' % params[0]
+	# print 'Free Memory: %s' % params[1]
+	# # Simulate msg to drone
+	# sim_msg = comms.Message(to_id=6, from_id=1, type_id=5, payload='GARBAGE')
+	# message_queue.put(sim_msg)
 	# Time process
 	time_delta = time.time() - start_time
-	print time_delta
-	
-def heartbeat_loop(link, pool, shared, send_message_queue):
+	print 'Drone ID %s processed in %s seconds' % (msg.from_id, time_delta)
+
+
+def heartbeat_loop(link, pool, swarm, message_queue):
+	print 'Starting heartbeat loop'
 	# Create waitlist from updated list of active drones
-	waitlist = list(shared.swarm.drones)
-	print 'waitlist: %s' % (waitlist,)
+	waitlist = list(swarm['active_drones'])
+	print 'Drone waitlist: %s' % (waitlist,)
 	# Send heartbeat
 	print 'Sending heartbeat'
 	heartbeat = comms.Message(to_id=0, from_id=1, type_id=1, payload='')
-	send_message_queue.put(heartbeat)
+	message_queue.put(heartbeat)
 	while True:
 		# Wait for msg
 		message = link.read_message()
@@ -59,46 +67,65 @@ def heartbeat_loop(link, pool, shared, send_message_queue):
 		drone_id = message.from_id
 		if drone_id in waitlist:
 			waitlist.remove(drone_id)
-			print 'Dispatching routine for drone ID %s' % (drone_id,)
-			pool.apply_async(drone_loop, [shared, message, send_message_queue])
+			# Process msg in drone_loop - Async
+			pool.apply_async(drone_loop, [swarm, message, message_queue])
 		if not waitlist:
-			print 'Waitlist empty'
+			print 'All drones responded'
 			break
 
-def process_message_queue(link, shared, send_message_queue):
-	print 'Started message send process'
+
+def process_message_queue(link, message_queue):
+	print 'Started message sender'
 	while True:
-		msg = send_message_queue.get()
+		msg = message_queue.get()
 		if not msg:
 			print 'Quitting message send process'
 			break
 		print 'Sending queued message'
 		link.send_message(msg)
 
-def main_routine(link, swarm):
+
+if __name__ == '__main__':
+	# TODO: CLI arguments
+	print 'Starting Queen'
+	# Setup link
+	print 'Setting up link to swarm'
+	link = comms.Link(read_timeout=2)
+
+	# Get list of active drones - Blocking
+	print 'Getting list of active drones'
+	active_drones = helpers.get_active_drones(link)
+	print 'Recieved drones: %s' % (active_drones,)
+	# print 'Startup complete'
+
 	# Setup Process pool
 	print 'Spinning up process pool'
-	pool = multiprocessing.Pool(len(swarm.drones) + 1, helpers.initialize_worker)
-	print 'Creating shared memory'
+	pool = multiprocessing.Pool(len(active_drones) + 1, helpers.initialize_worker)
 	# Setup shared memory
-	shared, send_message_queue = helpers.setup_shared_memory_and_queue()
-	shared.swarm = swarm
-	# Create message send process
-	send_message_process = multiprocessing.Process(target=process_message_queue, args=[link, shared, send_message_queue])
-	send_message_process.start()
+	print 'Creating shared memory'
+	# Create memory manager process
+	memory_manager = multiprocessing.Manager()
+	memory_manager.start()
+	# Create swarm object
+	swarm = memory_manager.dict()
+	swarm['active_drones'] = active_drones
+	# Create message queue
+	message_queue = memory_manager.Queue()
+	# Start message sender
+	pool.apply_async(process_message_queue, [link, message_queue])
 	# Start heartbeat loop
 	try:
 		while True:
 			start_time = time.time()
-			heartbeat_loop(link, pool, shared, send_message_queue)
+			heartbeat_loop(link, pool, swarm, message_queue)
 			time_delta = time.time() - start_time
 			# Time loop
-			sleep_for = 1.0 - time_delta
+			sleep_time = 1.0 - time_delta
 			# Check if need to sleep
-			if sleep_for < 0:
+			if sleep_time < 0:
 				continue
-			print 'Sleeping for %s' % (sleep_for,)
-			time.sleep(sleep_for)
+			print 'Sleeping for %s' % (sleep_time,)
+			time.sleep(sleep_time)
 	except KeyboardInterrupt:
 		print 'Caught SIGINT, shutting down'
 		# Kill pool
@@ -109,20 +136,6 @@ def main_routine(link, swarm):
 	finally:
 		print 'Shutting down process pool'
 		pool.join()
+		memory_manager.shutdown()
+		print 'Shutting down shared_memory'		
 		print 'Shutting down main process'
-
-if __name__ == '__main__':
-	# TODO: CLI arguments
-	# Startup routine
-	print 'Performing Queen setup'
-	swarm = SwarmState('TheFirstSwarm')
-	# Setup link
-	link = comms.Link(read_timeout=2)
-	print 'Set up link to swarm'
-	# Get list of active drones - Blocking
-	print 'Getting list of active drones'
-	swarm.drones = helpers.get_active_drones(link)
-	print 'Recieved drones: %s' % (swarm.drones,)
-	print 'Startup complete'
-	# Start Queen routine
-	main_routine(link, swarm)

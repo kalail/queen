@@ -1,7 +1,7 @@
 import communication
 import multiprocessing
 import serial
-from .multiprocessing import initialize_worker
+from .process import initialize_worker
 
 def simple_heartbeat():
 	port = serial.Serial('/dev/ttyUSB0', 9600, timeout=2)

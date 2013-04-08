@@ -105,7 +105,6 @@ if __name__ == '__main__':
 	print 'Creating shared memory'
 	# Create memory manager process
 	memory_manager = multiprocessing.Manager()
-	memory_manager.start()
 	# Create swarm object
 	swarm = memory_manager.dict()
 	swarm['active_drones'] = active_drones
@@ -136,6 +135,5 @@ if __name__ == '__main__':
 	finally:
 		print 'Shutting down process pool'
 		pool.join()
-		memory_manager.shutdown()
 		print 'Shutting down shared_memory'		
 		print 'Shutting down main process'

@@ -31,11 +31,11 @@ def drone_loop(swarm, msg, message_queue):
 	start_time = time.time()
 	# Extract payload
 	payload = msg.payload
-	params = payload.split(',')
-	print params
+	# params = payload.split(',')
+	print payload
 	# Update swarm
-	swarm_key = 'drone_%s' % msg.from_id
-	swarm[swarm_key] = params[0]
+	# swarm_key = 'drone_%s' % msg.from_id
+	# swarm[swarm_key] = params[0]
 	# print 'State ID: %s' % params[0]
 	# print 'Free Memory: %s' % params[1]
 	# # Simulate msg to drone
@@ -106,11 +106,10 @@ if __name__ == '__main__':
 	print 'Creating shared memory'
 	# Create memory manager process
 	memory_manager = multiprocessing.Manager()
-	# Create swarm object
+	# Create shared objects
 	swarm = memory_manager.dict()
-	swarm['active_drones'] = active_drones
-	# Create message queue
 	message_queue = memory_manager.Queue()
+	swarm['active_drones'] = active_drones
 	# Start message sender
 	pool.apply_async(process_message_queue, [link, message_queue])
 	# Start heartbeat loop

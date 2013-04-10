@@ -86,9 +86,9 @@ def process_message_queue(link, message_queue):
 		if not msg:
 			print 'Quitting message send process'
 			break
-		print 'Sending queued message'
+		print 'Recieved queued msg %s' % msg
 		link.send_message(msg)
-		print 'Sent: %s' % msg
+		print 'Sent' 
 
 
 if __name__ == '__main__':

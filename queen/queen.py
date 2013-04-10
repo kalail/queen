@@ -111,7 +111,7 @@ if __name__ == '__main__':
 	message_queue = memory_manager.Queue()
 	swarm['active_drones'] = active_drones
 	# Start message sender
-	pool.apply_async(process_message_queue, [link, message_queue])
+	pool.apply_async(process_message_queue, args=(link, message_queue))
 	# Start heartbeat loop
 	try:
 		while True:

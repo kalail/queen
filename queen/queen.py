@@ -60,7 +60,7 @@ def heartbeat_loop(link, pool, swarm, message_queue):
 		message = link.read_message()
 		# Check for timeout
 		if not message:
-			print 'Timeout'
+			print 'Timeout reading heartbeat response'
 			break
 		print 'Recieved %s' % (message,)
 		# extract drone id
@@ -91,7 +91,7 @@ if __name__ == '__main__':
 	print 'Starting Queen'
 	# Setup link
 	print 'Setting up link to swarm'
-	link = comms.Link(read_timeout=2)
+	link = comms.Link(read_timeout=2, write_timeout=2)
 
 	# Get list of active drones - Blocking
 	print 'Getting list of active drones'

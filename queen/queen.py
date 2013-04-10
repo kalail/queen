@@ -83,6 +83,7 @@ def process_message_queue(link, message_queue):
 			break
 		print 'Sending queued message'
 		link.send_message(msg)
+		print 'Sent: %s' % msg
 
 
 if __name__ == '__main__':

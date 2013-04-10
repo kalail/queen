@@ -77,7 +77,12 @@ def heartbeat_loop(link, pool, swarm, message_queue):
 def process_message_queue(link, message_queue):
 	print 'Started message sender'
 	while True:
-		msg = message_queue.get()
+		try:
+			msg = message_queue.get(timeout=6)
+		except Exception:
+			# Catch timeout and repeat
+			print 'Timeout in message sender'
+			continue
 		if not msg:
 			print 'Quitting message send process'
 			break
@@ -112,6 +117,7 @@ if __name__ == '__main__':
 	swarm['active_drones'] = active_drones
 	# Start message sender
 	pool.apply_async(process_message_queue, args=(link, message_queue))
+	time.sleep(2)
 	# Start heartbeat loop
 	try:
 		while True:

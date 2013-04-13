@@ -7,11 +7,14 @@ def simple_ping():
 	port = serial.Serial('/dev/ttyUSB0', 9600, timeout=2)
 	send_msg = '0\n'
 	port.write(send_msg)
+	print 'Sent: %s' % send_msg
 	messages = []
 	while True:
 		msg = port.readline()
 		if not msg:
+			print 'Timeout'
 			break
+		print 'Recieved: %s' % msg
 		messages.append(msg)
 	return messages
 

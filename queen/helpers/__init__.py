@@ -33,7 +33,7 @@ def xbee_ping():
 	print 'Sent {0} to drones {1}'.format(msg, drone_addrs)
 	messages = []
 	while True:
-		msg = port.readline()
+		msg = xbee.wait_read_frame()
 		if not msg:
 			print 'Timeout'
 			break

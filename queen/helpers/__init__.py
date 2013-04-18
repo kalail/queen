@@ -21,31 +21,26 @@ def simple_ping():
 		messages.append(msg)
 	return messages
 
+
+def handle_data(data):
+	drone_id = data['source_addr']
+	msg = data['rf_data']
+	print 'Recieved %s from drone %s' % (msg, drone_id)
+
+
 def xbee_ping():
 	port = serial.Serial('/dev/ttyUSB0', 9600, timeout=2)
-	xbee = XBee(port)
+	xbee = XBee(port, callback=handle_data)
 	msg = '0\n'
 	drone_addrs = [
 		'\x00\x02',
 		'\x00\x03'
 	]
-	start_time = time.clock()
-	for addr in drone_addrs:
-		xbee.tx(dest_addr=addr, data=msg)
-	print 'Sent {0} to drones {1}'.format(msg, drone_addrs)
-	expected = len(drone_addrs)
-	messages = []
-	while expected:
-		frame = xbee.wait_read_frame()
-		drone_id = frame['source_addr']
-		msg = frame['rf_data']
-		expected -= 1
-		print 'Recieved %s from drone %s' % (msg, drone_id)
-		messages.append(msg)
-	end_time = time.clock()
-	delta = end_time - start_time
-	print delta
-	return messages
+	while True:
+		for addr in drone_addrs:
+			xbee.tx(dest_addr=addr, data=msg)
+		print 'Sent {0} to drones {1}'.format(msg, drone_addrs)
+		time.sleep(1)
 
 def simple_heartbeat():
 	port = serial.Serial('/dev/ttyUSB0', 9600, timeout=2)

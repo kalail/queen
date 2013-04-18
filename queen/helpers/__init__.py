@@ -1,5 +1,6 @@
 import communication
 import serial
+import time
 
 from xbee import XBee
 from .process import initialize_worker
@@ -28,17 +29,22 @@ def xbee_ping():
 		'\x00\x02',
 		'\x00\x03'
 	]
+	start_time = time.clock()
 	for addr in drone_addrs:
 		xbee.tx(dest_addr=addr, data=msg)
 	print 'Sent {0} to drones {1}'.format(msg, drone_addrs)
+	expected = len(drone_addrs)
 	messages = []
-	while True:
-		msg = xbee.wait_read_frame()
-		if not msg:
-			print 'Timeout'
-			break
-		print 'Recieved: %s' % msg
+	while expected:
+		frame = xbee.wait_read_frame()
+		drone_id = frame['source_addr']
+		msg = frame['rf_data']
+		expected -= 1
+		print 'Recieved %s from drone %s' % (msg, drone_id)
 		messages.append(msg)
+	end_time = time.clock()
+	delta = end_time - start_time
+	print delta
 	return messages
 
 def simple_heartbeat():

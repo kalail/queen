@@ -30,7 +30,7 @@ def xbee_ping():
 	]
 	for addr in drone_addrs:
 		xbee.tx(dest_addr=addr, data=msg)
-	print 'Sent {0} to drones {1}'.format((msg, drone_addrs))
+	print 'Sent {0} to drones {1}'.format(msg, drone_addrs)
 	messages = []
 	while True:
 		msg = port.readline()

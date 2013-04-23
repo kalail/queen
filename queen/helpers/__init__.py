@@ -22,7 +22,7 @@ def simple_ping():
 	return messages
 
 
-def handle_data(data):
+def handle_message(data):
 	drone_id = data['source_addr']
 	msg = data['rf_data']
 	print 'Recieved %s from drone %s' % (msg, drone_id)
@@ -30,7 +30,7 @@ def handle_data(data):
 
 def xbee_ping():
 	port = serial.Serial('/dev/ttyUSB0', 9600, timeout=2)
-	xbee = XBee(port, callback=handle_data)
+	xbee = XBee(port, callback=handle_message)
 	msg = '0\n'
 	drone_addrs = [
 		'\x00\x02',

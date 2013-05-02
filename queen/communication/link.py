@@ -1,4 +1,5 @@
 import serial
+from xbee import XBee
 from .messages import Message
 
 
@@ -10,9 +11,14 @@ class Link(object):
 
 	"""
 
-	def __init__(self, read_timeout=None, write_timeout=None):
+	def __init__(self, callback=None, read_timeout=None, write_timeout=None):
 		self.port = serial.Serial('/dev/ttyUSB0', 9600, timeout=read_timeout, writeTimeout=write_timeout)
-		self.active = True
+		if callback:
+			self.xbee = XBee(self.port, callback=callback)
+			self.api = True
+		else:
+			self.api = False
+
 
 
 	def send_message(self, msg):
@@ -24,7 +30,10 @@ class Link(object):
 		# Convert message
 		string = str(msg)
 		# Write serial
-		self.__send_string(string)
+		if self.api:
+			self.__send_packet(string, msg.to_id)
+		else:
+			self.__send_string(string)
 		
 
 	def __send_string(self, string):
@@ -44,6 +53,20 @@ class Link(object):
 			if num_bytes != len(string):
 				print 'Error: Mismatch in number of bytes written to port.'
 
+	def __send_packet(self, string, to_id):
+		"""Send Packet
+
+		Write *string* into the associated port.
+
+		"""
+		# Try to write string
+		try:
+			addr = to_id
+			self.xbee.tx(dest_addr=addr, data=string)
+		# Catch timeout
+		except serial.SerialTimeoutException:
+			print 'Error: timeout writing to port.'
+
 
 	def __read_string(self):
 		"""Read String - Blocks!
@@ -54,20 +77,32 @@ class Link(object):
 		string = self.port.readline()
 		return string
 
+	def __read_packet(self):
+		"""Read String - Blocks!
+
+		Reads and returns a string if one is recieved.
+
+		"""
+		string = self.port.readline()
+		return string
+
 
 	def read_message(self):
-		"""Read Message - Blocks!
+		"""Read Message (for serial mode - Blocks!)
 
 		Parses a string, if recieved, and returns a message.
 
 		"""
 		# Get string
-		string = self.__read_string()
-		# Check for timeout
-		if not string:
+		if self.api:
 			return None
-		msg = Message(string=string)
-		return msg
+		else:
+			string = self.__read_string()
+			# Check for timeout
+			if not string:
+				return None
+			msg = Message(string=string)
+			return msg
 
 
 	def close(self):
@@ -76,9 +111,9 @@ class Link(object):
 		Proper close method. must be called manually.
 
 		"""
+		# self.xbee.close()
 		self.port.close()
 		del self.port
-		self.active = False
 
 
 	def __del__(self):

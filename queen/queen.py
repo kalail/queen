@@ -91,12 +91,15 @@ def process_message_queue(link, message_queue):
 		print 'Sent' 
 
 
+def handle_packet(packet):
+	print packet
+
 if __name__ == '__main__':
 	# TODO: CLI arguments
 	print 'Starting Queen'
 	# Setup link
 	print 'Setting up link to swarm'
-	link = comms.Link(read_timeout=2, write_timeout=2)
+	link = comms.Link(callback=handle_packet, read_timeout=2, write_timeout=2)
 
 	# Get list of active drones - Blocking
 	print 'Getting list of active drones'

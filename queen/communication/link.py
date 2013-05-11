@@ -113,12 +113,6 @@ class Link(object):
 		Proper close method. must be called manually.
 
 		"""
-		# self.xbee.close()
+		if self.api:
+			self.xbee.close()
 		self.port.close()
-		del self.port
-
-
-	def __del__(self):
-		"""Memory Destructor - Not always called"""
-
-		self.close()

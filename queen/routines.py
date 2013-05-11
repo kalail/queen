@@ -19,7 +19,6 @@ class DiscoverDronesRoutine(object):
 def discover_drones(swarm):
 	routine = DiscoverDronesRoutine(swarm.active_drone_ids)
 	messages = [communication.Message(to_id=i, from_id=1, type_id=0, payload=swarm.name) for i in swarm.drone_ids if i not in swarm.active_drone_ids]
-	print messages[0]
 	link = communication.Link(callback=routine.recieve_response, read_timeout=2, write_timeout=2)
 	for msg in messages:
 		link.send_message(msg)
@@ -36,7 +35,7 @@ class HeartbeatRoutine(object):
 		self.complete = False
 
 	def recieve_response(self, data):
-		drone_id = data['source_addr']
+		drone_id = helpers.to_int(data['source_addr'])
 		if drone_id not in self.active_drone_ids:
 			print 'Unexpected response from inactive Drone %s' % drone_id
 			return

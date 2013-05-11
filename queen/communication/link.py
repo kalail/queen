@@ -11,6 +11,19 @@ class Link(object):
 
 	"""
 
+	drone_addrs = [
+		None,
+		None,
+		'\x00\x02',
+		'\x00\x03',
+		'\x00\x04',
+		'\x00\x05',
+		'\x00\x06',
+		'\x00\x07',
+		'\x00\x08',
+		'\x00\x09'
+	]
+
 	def __init__(self, callback=None, read_timeout=None, write_timeout=None):
 		self.port = serial.Serial('/dev/ttyUSB0', 9600, timeout=read_timeout, writeTimeout=write_timeout)
 		if callback:
@@ -60,7 +73,7 @@ class Link(object):
 		"""
 		# Try to write string
 		try:
-			addr = to_id
+			addr = self.drone_addrs[to_id]
 			self.xbee.tx(dest_addr=addr, data=string)
 		# Catch timeout
 		except serial.SerialTimeoutException:

@@ -20,10 +20,10 @@ class DiscoverDronesRoutine(object):
 		print msg
 
 def discover_drones(swarm):
-	print 'Discovering active drones'
 	routine = DiscoverDronesRoutine(swarm.active_drone_ids)
-	link = communication.Link(callback=routine.recieve_response, read_timeout=2, write_timeout=2)
 	messages = [communication.Message(to_id=i, from_id=1, type_id=0, payload=swarm.name) for i in swarm.drone_ids if i not in swarm.active_drone_ids]
+	print messages[0]
+	link = communication.Link(callback=routine.recieve_response, read_timeout=2, write_timeout=2)
 	for msg in messages:
 		link.send_message(msg)
 	time.sleep(0.5)

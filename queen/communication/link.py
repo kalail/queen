@@ -113,6 +113,4 @@ class Link(object):
 		Proper close method. must be called manually.
 
 		"""
-		if self.api:
-			self.xbee.close()
 		self.port.close()

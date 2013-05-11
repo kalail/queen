@@ -12,9 +12,11 @@ import time
 import communication as comms
 import helpers
 import multiprocessing
+import routines
 
-class SwarmState(object):
-	"""Swarm State
+
+class Swarm(object):
+	"""Swarm
 
 	Represents the current state of the swarm. Used to make decisions and must be passed to any method making them.
 
@@ -22,8 +24,9 @@ class SwarmState(object):
 	
 	def __init__(self, name):
 		self.name = name
+		self.drone_ids = range(2,10)
+		self.active_drone_ids = []
 		self.drones = []
-		self.new = True
 
 
 def drone_loop(swarm, msg, message_queue):
@@ -91,57 +94,55 @@ def process_message_queue(link, message_queue):
 		print 'Sent' 
 
 
-def handle_packet(packet):
-	print packet
-
 if __name__ == '__main__':
-	# TODO: CLI arguments
 	print 'Starting Queen'
-	# Setup link
-	print 'Setting up link to swarm'
-	link = comms.Link(callback=handle_packet, read_timeout=2, write_timeout=2)
+	swarm = Swarm('TheFirstSwarm')
 
-	# Get list of active drones - Blocking
-	print 'Getting list of active drones'
-	active_drones = helpers.get_active_drones(link)
-	print 'Recieved drones: %s' % (active_drones,)
-	# print 'Startup complete'
+	# Discover drones
+	print 'Discovering active drones'
+	for i in xrange(3):
+		print 'iteration %s' % i
+		routines.discover_drones(swarm)
+	print 'Starting with drones: %s' % swarm.active_drone_ids
 
-	# Setup Process pool
-	print 'Spinning up process pool'
-	pool = multiprocessing.Pool(len(active_drones) + 1, helpers.initialize_worker)
-	# Setup shared memory
-	print 'Creating shared memory'
-	# Create memory manager process
-	memory_manager = multiprocessing.Manager()
-	# Create shared objects
-	swarm = memory_manager.dict()
-	message_queue = memory_manager.Queue()
-	swarm['active_drones'] = active_drones
-	# Start message sender
-	pool.apply_async(process_message_queue, args=(link, message_queue))
-	time.sleep(2)
-	# Start heartbeat loop
-	try:
-		while True:
-			start_time = time.time()
-			heartbeat_loop(link, pool, swarm, message_queue)
-			time_delta = time.time() - start_time
-			# Time loop
-			sleep_time = 1.0 - time_delta
-			# Check if need to sleep
-			if sleep_time < 0:
-				continue
-			print 'Sleeping for %s' % (sleep_time,)
-			time.sleep(sleep_time)
-	except KeyboardInterrupt:
-		print 'Caught SIGINT, shutting down'
-		# Kill pool
-		pool.terminate()
-	else:
-		# Tell pool to finish
-		pool.close()
-	finally:
-		print 'Shutting down process pool'
-		pool.join()
-		print 'Shutting down main process'
+
+	while True:
+		routines.heartbeat_routine(swarm)
+	# # Setup Process pool
+	# print 'Spinning up process pool'
+	# pool = multiprocessing.Pool(len(swarm.active_drones) + 1, helpers.initialize_worker)
+	# # Setup shared memory
+	# print 'Creating shared memory'
+	# # Create memory manager process
+	# memory_manager = multiprocessing.Manager()
+	# # Create shared objects
+	# shared = memory_manager.dict()
+	# message_queue = memory_manager.Queue()
+	# shared['swarm'] = swarm.active_drones
+	# # Start message sender
+	# pool.apply_async(process_message_queue, args=(link, message_queue))
+	# time.sleep(2)
+	# # Start heartbeat loop
+	# try:
+	# 	while True:
+	# 		start_time = time.time()
+	# 		heartbeat_loop(link, pool, swarm, message_queue)
+	# 		time_delta = time.time() - start_time
+	# 		# Time loop
+	# 		sleep_time = 1.0 - time_delta
+	# 		# Check if need to sleep
+	# 		if sleep_time < 0:
+	# 			continue
+	# 		print 'Sleeping for %s' % (sleep_time,)
+	# 		time.sleep(sleep_time)
+	# except KeyboardInterrupt:
+	# 	print 'Caught SIGINT, shutting down'
+	# 	# Kill pool
+	# 	pool.terminate()
+	# else:
+	# 	# Tell pool to finish
+	# 	pool.close()
+	# finally:
+	# 	print 'Shutting down process pool'
+	# 	pool.join()
+	# 	print 'Shutting down main process'

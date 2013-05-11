@@ -20,7 +20,6 @@ class Link(object):
 			self.api = False
 
 
-
 	def send_message(self, msg):
 		"""Send message
 
@@ -76,16 +75,6 @@ class Link(object):
 		"""
 		string = self.port.readline()
 		return string
-
-	def __read_packet(self):
-		"""Read String - Blocks!
-
-		Reads and returns a string if one is recieved.
-
-		"""
-		string = self.port.readline()
-		return string
-
 
 	def read_message(self):
 		"""Read Message (for serial mode - Blocks!)

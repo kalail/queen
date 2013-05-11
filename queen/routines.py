@@ -16,8 +16,6 @@ class DiscoverDronesRoutine(object):
 			print 'Discovered drone with ID: %s' % data['source_addr']
 		string = data['rf_data']
 		print string
-		msg = Message(string)
-		print msg
 
 def discover_drones(swarm):
 	routine = DiscoverDronesRoutine(swarm.active_drone_ids)

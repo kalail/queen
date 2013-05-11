@@ -1,6 +1,7 @@
 import communication
 import time
 from communication.messages import Message
+import helpers
 
 
 class DiscoverDronesRoutine(object):
@@ -9,13 +10,11 @@ class DiscoverDronesRoutine(object):
 		self.active_drone_ids = active_drone_ids
 
 	def recieve_response(self, data):
-		if not data:
-			return
-		if data['source_addr'] not in self.active_drone_ids:
-			self.active_drone_ids.append(data['source_addr'])
-			print 'Discovered drone with ID: %s' % data['source_addr']
+		drone_id = helpers.to_int(data['source_addr'])
+		if drone_id not in self.active_drone_ids:
+			self.active_drone_ids.append(drone_id)
+			print 'Discovered drone with ID: %s' % drone_id
 		string = data['rf_data']
-		print string
 
 def discover_drones(swarm):
 	routine = DiscoverDronesRoutine(swarm.active_drone_ids)
@@ -24,7 +23,7 @@ def discover_drones(swarm):
 	link = communication.Link(callback=routine.recieve_response, read_timeout=2, write_timeout=2)
 	for msg in messages:
 		link.send_message(msg)
-	time.sleep(0.5)
+	time.sleep(1)
 	swarm.active_drone_ids = routine.active_drone_ids
 	link.close()
 
@@ -39,14 +38,14 @@ class HeartbeatRoutine(object):
 	def recieve_response(self, data):
 		drone_id = data['source_addr']
 		if drone_id not in self.active_drone_ids:
-			print 'Unexpected response from Drone %s' % drone_id
+			print 'Unexpected response from inactive Drone %s' % drone_id
 			return
 		if drone_id in self.drones_responded:
 			print 'Drone %s responded more than once' % drone_id
 			return
 		self.drones_responded.append(drone_id)
 		string = data['rf_data']
-		print string
+		# print string
 		# msg = Message(string)
 		# print msg
 		check = [i in self.drones_responded for i in self.active_drone_ids]

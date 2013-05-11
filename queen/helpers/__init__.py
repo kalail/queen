@@ -57,6 +57,25 @@ def simple_heartbeat():
 
 
 
-
-class Run(object):
-	active_drone_ids = range(2,10)
+def to_int(addr):
+	if addr == '\x00\x00':
+		return 0
+	elif addr == '\x00\x01':
+		return 1
+	elif addr == '\x00\x02':
+		return 2
+	elif addr == '\x00\x03':
+		return 3
+	elif addr == '\x00\x04':
+		return 4
+	elif addr == '\x00\x05':
+		return 5
+	elif addr == '\x00\x06':
+		return 6
+	elif addr == '\x00\x07':
+		return 7
+	elif addr == '\x00\x08':
+		return 8
+	elif addr == '\x00\x09':
+		return 9
+	

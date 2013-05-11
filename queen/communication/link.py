@@ -12,8 +12,8 @@ class Link(object):
 	"""
 
 	drone_addrs = [
-		None,
-		None,
+		'\x00\x00',
+		'\x00\x01',
 		'\x00\x02',
 		'\x00\x03',
 		'\x00\x04',

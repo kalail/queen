@@ -42,6 +42,7 @@ class HeartbeatRoutine(object):
 		if drone_id in self.drones_responded:
 			print 'Drone %s responded more than once' % drone_id
 			return
+		print 'Recieved response from Drone %s' % drone_id
 		self.drones_responded.append(drone_id)
 		string = data['rf_data']
 		# print string
@@ -49,6 +50,7 @@ class HeartbeatRoutine(object):
 		# print msg
 		check = [i in self.drones_responded for i in self.active_drone_ids]
 		if False not in check:
+			print 'Routine complete'
 			self.complete = True
 
 
@@ -64,5 +66,10 @@ def heartbeat_routine(swarm):
 		print 'Loop complete'
 		link.close()
 		return
-	time.sleep(1)
+	time.sleep(0.5)
+	if routine.complete:
+		print 'Loop complete'
+		link.close()
+		return
+	time.sleep(0.5)
 	link.close()

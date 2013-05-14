@@ -16,7 +16,6 @@ class DiscoverDronesRoutine(object):
 		else:
 			print 'Rediscovered drone with ID: %s' % drone_id
 		string = data['rf_data']
-		print string
 
 def discover_drones(swarm):
 	routine = DiscoverDronesRoutine(swarm.active_drone_ids)
@@ -31,10 +30,11 @@ def discover_drones(swarm):
 
 class HeartbeatRoutine(object):
 
-	def __init__(self, active_drone_ids):
+	def __init__(self, link, active_drone_ids):
 		self.active_drone_ids = active_drone_ids
 		self.drones_responded = []
 		self.complete = False
+		self.link = link
 
 	def recieve_response(self, data):
 		drone_id = helpers.to_int(data['source_addr'])
@@ -47,10 +47,17 @@ class HeartbeatRoutine(object):
 		print 'Recieved response from Drone %s' % drone_id
 		self.drones_responded.append(drone_id)
 		string = data['rf_data']
-		print string
 		msg = communication.Message(string)
 		params = parser.parse(msg)
-		print 'Duration in state: %s' % (params['duration'],)
+		if msg.type_id == 1:
+			print 'Duration in state: %s' % (params['duration'],)
+			if params['duration'] > 20:
+				order = communication.Message(to_id=3, from_id=1, type_id=12, payload='1')
+				self.link.send_message(order)
+				print "ERMAGAUD!ERMAGAUD!ERMAGAUD!"
+		elif msg.type_id == 4:
+			print 'In state "Deploy"\nDuration: %s\nComplete%s' % (params['duration'], params['complete'])
+
 
 		check = [i in self.drones_responded for i in self.active_drone_ids]
 		if False not in check:
@@ -60,7 +67,7 @@ class HeartbeatRoutine(object):
 
 def heartbeat_routine(link, swarm):
 	print 'Sending heartbeat'
-	routine = HeartbeatRoutine(swarm.active_drone_ids)
+	routine = HeartbeatRoutine(link, swarm.active_drone_ids)
 	link.set_callback(routine.recieve_response)
 	messages = [communication.Message(to_id=i, from_id=1, type_id=2, payload='') for i in swarm.active_drone_ids]
 	for msg in messages:

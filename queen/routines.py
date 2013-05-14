@@ -46,6 +46,7 @@ class HeartbeatRoutine(object):
 		print 'Recieved response from Drone %s' % drone_id
 		self.drones_responded.append(drone_id)
 		string = data['rf_data']
+		print string
 		msg = communication.Message(string)
 		params = parser.parse(msg)
 		print 'Duration in state: %s' % (params['duration'],)

@@ -16,6 +16,7 @@ class DiscoverDronesRoutine(object):
 		else:
 			print 'Rediscovered drone with ID: %s' % drone_id
 		string = data['rf_data']
+		print string
 
 def discover_drones(swarm):
 	routine = DiscoverDronesRoutine(swarm.active_drone_ids)

@@ -49,7 +49,7 @@ class HeartbeatRoutine(object):
 		string = data['rf_data']
 		msg = communication.Message(string)
 		params = parser.parse(msg)
-		if msg.type_id == 1:
+		if msg.type_id == 3:
 			print 'Duration in state: %s' % (params['duration'],)
 			if params['duration'] > 20:
 				order = communication.Message(to_id=3, from_id=1, type_id=12, payload='1')

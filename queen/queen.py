@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
 	# Discover drones
 	print 'Discovering active drones'
-	for i in xrange(3):
+	for i in xrange(6):
 		print 'iteration %s' % i
 		routines.discover_drones(swarm)
 	print 'Starting with drones: %s' % swarm.active_drone_ids

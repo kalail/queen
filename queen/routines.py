@@ -13,6 +13,8 @@ class DiscoverDronesRoutine(object):
 		if drone_id not in self.active_drone_ids:
 			self.active_drone_ids.append(drone_id)
 			print 'Discovered drone with ID: %s' % drone_id
+		else:
+			print 'Rediscovered drone with ID: %s' % drone_id
 		string = data['rf_data']
 
 def discover_drones(swarm):
@@ -21,7 +23,7 @@ def discover_drones(swarm):
 	link = communication.Link(callback=routine.recieve_response, read_timeout=2, write_timeout=2)
 	for msg in messages:
 		link.send_message(msg)
-	time.sleep(1)
+	time.sleep(0.5)
 	swarm.active_drone_ids = routine.active_drone_ids
 	link.close()
 

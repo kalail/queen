@@ -1,4 +1,4 @@
-import re
+
 
 # Defined payloads
 defined_payloads = (

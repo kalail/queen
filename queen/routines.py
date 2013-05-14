@@ -14,6 +14,7 @@ class DiscoverDronesRoutine(object):
 			self.active_drone_ids.append(drone_id)
 			print 'Discovered drone with ID: %s' % drone_id
 		string = data['rf_data']
+		print string
 
 def discover_drones(swarm):
 	routine = DiscoverDronesRoutine(swarm.active_drone_ids)

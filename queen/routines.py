@@ -51,7 +51,7 @@ class HeartbeatRoutine(object):
 		params = parser.parse(msg)
 		if msg.type_id == 3:
 			print 'Duration in state: %s' % (params['duration'],)
-			if params['duration'] > 20:
+			if params['duration'] > 10:
 				order = communication.Message(to_id=3, from_id=1, type_id=12, payload='1')
 				self.link.send_message(order)
 				print "ERMAGAUD!ERMAGAUD!ERMAGAUD!"

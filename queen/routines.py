@@ -56,7 +56,7 @@ class HeartbeatRoutine(object):
 				self.link.send_message(order)
 				print "ERMAGAUD!ERMAGAUD!ERMAGAUD!"
 		elif msg.type_id == 4:
-			print 'In state "Deploy"\nDuration: %s\nComplete%s' % (params['duration'], params['complete'])
+			print 'In state "Deploy"\nDuration: %s\nComplete: %s' % (params['duration'], params['complete'])
 
 
 		check = [i in self.drones_responded for i in self.active_drone_ids]

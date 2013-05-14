@@ -12,5 +12,8 @@ def parse(msg):
 	for i, param in enumerate(specified_payload['parameters']):
 		name = param[0]
 		param_type = param[1]
-		result_dict[name] = param_type(parsed_params[i])
+		if param_type == bool:
+			result_dict[name] = param_type(int(parsed_params[i]))	
+		else:
+			result_dict[name] = param_type(parsed_params[i])
 	return result_dict

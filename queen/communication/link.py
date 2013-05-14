@@ -32,6 +32,10 @@ class Link(object):
 		else:
 			self.api = False
 
+	def set_callback(self, callback):
+		if self.api:
+			self._close_xbee()
+			self.xbee = XBee(self.port, callback=callback)
 
 	def send_message(self, msg):
 		"""Send message
@@ -113,6 +117,12 @@ class Link(object):
 		Proper close method. must be called manually.
 
 		"""
+		self._close_xbee()
+		self._close_port()
+
+	def _close_xbee(self):
 		if self.api:
 			self.xbee.halt()
+
+	def _close_port(self):
 		self.port.close()

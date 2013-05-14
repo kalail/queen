@@ -9,7 +9,7 @@ Creates the majestic queen bot.
 
 """
 import time
-import communication as comms
+import communication
 import helpers
 import multiprocessing
 import routines
@@ -56,7 +56,7 @@ def heartbeat_loop(link, pool, swarm, message_queue):
 	print 'Drone waitlist: %s' % (waitlist,)
 	# Send heartbeat
 	print 'Sending heartbeat'
-	heartbeat = comms.Message(to_id=0, from_id=1, type_id=1, payload='')
+	heartbeat = communication.Message(to_id=0, from_id=1, type_id=1, payload='')
 	message_queue.put(heartbeat)
 	while True:
 		# Wait for msg
@@ -105,9 +105,17 @@ if __name__ == '__main__':
 		routines.discover_drones(swarm)
 	print 'Starting with drones: %s' % swarm.active_drone_ids
 
+	# Heartbeat loop
+	link = communication.Link(callback=helpers.dummy_callback, read_timeout=2, write_timeout=2)
+	try:
+		while True:
+			routines.heartbeat_routine(link, swarm)
+	except KeyboardInterrupt:
+		print 'Caught SIGINT, shutting down'
+		link.close()
+	else:
+		pass
 
-	while True:
-		routines.heartbeat_routine(swarm)
 	# # Setup Process pool
 	# print 'Spinning up process pool'
 	# pool = multiprocessing.Pool(len(swarm.active_drones) + 1, helpers.initialize_worker)

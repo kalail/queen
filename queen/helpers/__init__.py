@@ -55,7 +55,8 @@ def simple_heartbeat():
 	return messages
 
 
-
+def dummy_callback(data):
+	pass
 
 def to_int(addr):
 	if addr == '\x00\x00':

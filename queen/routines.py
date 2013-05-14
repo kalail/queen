@@ -1,8 +1,7 @@
 import communication
 import time
-from communication.messages import Message
 import helpers
-
+import communication.parser as parser
 
 class DiscoverDronesRoutine(object):
 
@@ -45,31 +44,34 @@ class HeartbeatRoutine(object):
 		print 'Recieved response from Drone %s' % drone_id
 		self.drones_responded.append(drone_id)
 		string = data['rf_data']
-		# print string
-		# msg = Message(string)
-		# print msg
+		msg = communication.Message(string)
+		params = parser.parse(msg)
+		print 'Duration in state: %s' % (params['duration'],)
+
 		check = [i in self.drones_responded for i in self.active_drone_ids]
 		if False not in check:
 			print 'Routine complete'
 			self.complete = True
 
 
-def heartbeat_routine(swarm):
+def heartbeat_routine(link, swarm):
 	print 'Sending heartbeat'
 	routine = HeartbeatRoutine(swarm.active_drone_ids)
-	link = communication.Link(callback=routine.recieve_response, read_timeout=2, write_timeout=2)
-	messages = [communication.Message(to_id=i, from_id=1, type_id=1, payload='HEART') for i in swarm.active_drone_ids]
+	link.set_callback(routine.recieve_response)
+	messages = [communication.Message(to_id=i, from_id=1, type_id=2, payload='') for i in swarm.active_drone_ids]
 	for msg in messages:
 		link.send_message(msg)
-	time.sleep(1)
+	# Try to check if complete in 1 second
+	time.sleep(0.5)
 	if routine.complete:
 		print 'Loop complete'
-		link.close()
 		return
 	time.sleep(0.5)
 	if routine.complete:
 		print 'Loop complete'
-		link.close()
 		return
 	time.sleep(0.5)
-	link.close()
+	if routine.complete:
+		print 'Loop complete'
+		return
+	time.sleep(0.5)

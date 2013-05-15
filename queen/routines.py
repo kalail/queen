@@ -47,12 +47,13 @@ class HeartbeatRoutine(object):
 		self.drones_responded.append(drone_id)
 		string = data['rf_data']
 		msg = communication.Message(string)
+		print 'Message type: %s' % msg.type_id
 		params = parser.parse(msg)
 		# Cases
 		if msg.type_id == 3:
 			print 'Duration in state: %s' % (params['duration'],)
 			if params['duration'] > 10:
-				order = communication.Message(to_id=drone_id, from_id=1, type_id=12, payload='1')
+				order = communication.Message(to_id=drone_id, from_id=1, type_id=12, payload='4')
 				self.link.send_message(order)
 				print "ERMAGAUD!ERMAGAUD!ERMAGAUD!"
 		elif msg.type_id == 4:
@@ -92,7 +93,7 @@ def heartbeat_routine(link, swarm):
 	# Try to check if complete in 1 second
 	time.sleep(0.5)
 	if routine.complete:
-		print 'Loop complete'
+		print 'Loop complete - Early'
 		return
 	time.sleep(0.5)
 	if routine.complete:
@@ -100,6 +101,6 @@ def heartbeat_routine(link, swarm):
 		return
 	time.sleep(0.5)
 	if routine.complete:
-		print 'Loop complete'
+		print 'Loop complete - Late'
 		return
 	time.sleep(0.5)

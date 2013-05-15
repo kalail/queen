@@ -48,15 +48,21 @@ class HeartbeatRoutine(object):
 		string = data['rf_data']
 		msg = communication.Message(string)
 		params = parser.parse(msg)
+		# Cases
 		if msg.type_id == 3:
 			print 'Duration in state: %s' % (params['duration'],)
 			if params['duration'] > 10:
-				order = communication.Message(to_id=3, from_id=1, type_id=12, payload='1')
+				order = communication.Message(to_id=drone_id, from_id=1, type_id=12, payload='1')
 				self.link.send_message(order)
 				print "ERMAGAUD!ERMAGAUD!ERMAGAUD!"
 		elif msg.type_id == 4:
 			print 'In state "Deploy"\nDuration: %s\nComplete: %s' % (params['duration'], params['complete'])
-
+			if params['complete']:
+				order = communication.Message(to_id=drone_id, from_id=1, type_id=12, payload='2')
+				self.link.send_message(order)
+				print "ERMAGAUD!ERMAGAUD!ERMAGAUD!"
+		elif msg.type_id == 5:
+			print 'In state "Searching"\nDuration: %s\nTracking: %s' % (params['duration'], params['tracking'])
 
 		check = [i in self.drones_responded for i in self.active_drone_ids]
 		if False not in check:

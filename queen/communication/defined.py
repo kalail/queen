@@ -36,8 +36,11 @@ defined_payloads = (
 	},
 	{
 		'id': 5,
-		'name': 'DiscoverResponse',
-		'parameters': ()
+		'name': 'SearchingResponse',
+		'parameters': (
+			('duration', int),
+			('tracking', bool),
+		)
 	},
 	{
 		'id': 6,

@@ -17,15 +17,14 @@ class DiscoverDronesRoutine(object):
 			print 'Rediscovered drone with ID: %s' % drone_id
 		string = data['rf_data']
 
-def discover_drones(swarm):
+def discover_drones(link, swarm):
 	routine = DiscoverDronesRoutine(swarm.active_drone_ids)
 	messages = [communication.Message(to_id=i, from_id=1, type_id=0, payload=swarm.name) for i in swarm.drone_ids if i not in swarm.active_drone_ids]
-	link = communication.Link(callback=routine.recieve_response, read_timeout=2, write_timeout=2)
+	link.set_callback(routine.recieve_response)
 	for msg in messages:
 		link.send_message(msg)
 	time.sleep(0.5)
 	swarm.active_drone_ids = routine.active_drone_ids
-	link.close()
 
 
 class HeartbeatRoutine(object):

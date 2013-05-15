@@ -97,19 +97,21 @@ def process_message_queue(link, message_queue):
 if __name__ == '__main__':
 	print 'Starting Queen'
 	swarm = Swarm('TheFirstSwarm')
-
-	# Discover drones
-	print 'Discovering active drones'
-	for i in xrange(6):
-		print 'iteration %s' % i
-		routines.discover_drones(swarm)
-	print 'Starting with drones: %s' % swarm.active_drone_ids
-
-	# Heartbeat loop
 	link = communication.Link(callback=helpers.dummy_callback, read_timeout=2, write_timeout=2)
+
 	try:
+		# Discover drones
+		print 'Discovering active drones'
+		for i in xrange(6):
+			print 'iteration %s' % i
+			routines.discover_drones(link, swarm)
+		print 'Starting with drones: %s' % swarm.active_drone_ids
+
+		# Heartbeat loop
 		while True:
 			routines.heartbeat_routine(link, swarm)
+
+	# Catch interrupt
 	except KeyboardInterrupt:
 		print 'Caught SIGINT, shutting down'
 		link.close()

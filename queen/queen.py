@@ -108,8 +108,10 @@ if __name__ == '__main__':
 		print 'Starting with drones: %s' % swarm.active_drone_ids
 
 		# Heartbeat loop
+		print 'Starting heartbeat loop'
 		while True:
 			routines.heartbeat_routine(link, swarm)
+			print ''
 
 	# Catch interrupt
 	except KeyboardInterrupt:

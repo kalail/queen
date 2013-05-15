@@ -53,7 +53,7 @@ class HeartbeatRoutine(object):
 		if msg.type_id == 3:
 			print 'Duration in state: %s' % (params['duration'],)
 			if params['duration'] > 10:
-				order = communication.Message(to_id=drone_id, from_id=1, type_id=12, payload='4')
+				order = communication.Message(to_id=drone_id, from_id=1, type_id=12, payload='1')
 				self.link.send_message(order)
 				print "ERMAGAUD!ERMAGAUD!ERMAGAUD!"
 		elif msg.type_id == 4:
@@ -69,7 +69,7 @@ class HeartbeatRoutine(object):
 				self.link.send_message(order)
 				print "ERMAGAUD!ERMAGAUD!ERMAGAUD!"
 		elif msg.type_id == 7:
-			print 'In state "Attacking"\nDuration: %s\nDistance: %s\nTracking State: %s\nCaptured: %s' % (params['duration'], params['distance'], params['tracker_state'], params['captured'])
+			print 'In state "Attacking"\nDuration: %s\nDistance: %s\nCaptured: %s' % (params['duration'], params['distance'], params['captured'])
 			if params['captured']:
 				order = communication.Message(to_id=drone_id, from_id=1, type_id=12, payload='6')
 				self.link.send_message(order)
@@ -104,3 +104,4 @@ def heartbeat_routine(link, swarm):
 		print 'Loop complete - Late'
 		return
 	time.sleep(0.5)
+	return

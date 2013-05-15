@@ -53,7 +53,6 @@ defined_payloads = (
 		'parameters': (
 			('duration', int),
 			('distance', int),
-			('tracker_state', int),
 			('captured', bool),
 		)
 	},

@@ -113,7 +113,7 @@ if __name__ == '__main__':
 
 	# Catch interrupt
 	except KeyboardInterrupt:
-		print 'Caught SIGINT, shutting down'
+		print '\nCaught SIGINT, shutting down\n'
 		link.close()
 	else:
 		pass

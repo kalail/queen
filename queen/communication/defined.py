@@ -44,27 +44,32 @@ defined_payloads = (
 	},
 	{
 		'id': 6,
-		'name': 'Heartbeat',
+		'name': 'RelocatingResponse',
 		'parameters': ()
 	},
 	{
 		'id': 7,
-		'name': 'IdleResponse',
+		'name': 'AttackingResponse',
 		'parameters': (
 			('duration', int),
+			('distance', int),
+			('tracker_state', int),
+			('captured', bool),
 		)
 	},
 	{
 		'id': 8,
-		'name': 'Discover',
-		'parameters': (
-			('swarm_name', str),
-		)
+		'name': 'SearchingNestResponse',
+		'parameters': ()
 	},
 	{
 		'id': 9,
-		'name': 'DiscoverResponse',
-		'parameters': ()
+		'name': 'ReturningResponse',
+		'parameters': (
+			('duration', int),
+			('tracking', bool),
+			('complete', bool),
+		)
 	},
 	{
 		'id': 10,

@@ -18,17 +18,17 @@ class Drone(object):
 		'Relocating'
 			duration
 		'Attacking',
-			distance
-			captured
-			prey_tracker_state
 			duration
+			distance
+			prey_tracker_state
+			captured
 		'SearchingNest',
 			tracking
 			duration
 		'Returning',
+			duration
 			tracking
 			complete
-			duration
 		'Delivering',
 			duration
 		'Disconnected',

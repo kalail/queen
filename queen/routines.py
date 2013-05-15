@@ -63,6 +63,18 @@ class HeartbeatRoutine(object):
 				print "ERMAGAUD!ERMAGAUD!ERMAGAUD!"
 		elif msg.type_id == 5:
 			print 'In state "Searching"\nDuration: %s\nTracking: %s' % (params['duration'], params['tracking'])
+			if params['tracking']:
+				order = communication.Message(to_id=drone_id, from_id=1, type_id=12, payload='4')
+				self.link.send_message(order)
+				print "ERMAGAUD!ERMAGAUD!ERMAGAUD!"
+		elif msg.type_id == 7:
+			print 'In state "Attacking"\nDuration: %s\nDistance: %s\nTracking State: %s\nCaptured: %s' % (params['duration'], params['distance'], params['tracker_state'], params['captured'])
+			if params['captured']:
+				order = communication.Message(to_id=drone_id, from_id=1, type_id=12, payload='6')
+				self.link.send_message(order)
+				print "ERMAGAUD!ERMAGAUD!ERMAGAUD!"
+		elif msg.type_id == 9:
+			print 'In state "Returning"\nDuration: %s\nTracking: %s\nComplete: %s' % (params['duration'], params['tracking'], params['complete'])
 
 		check = [i in self.drones_responded for i in self.active_drone_ids]
 		if False not in check:

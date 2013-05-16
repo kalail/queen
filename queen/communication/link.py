@@ -27,7 +27,7 @@ class Link(object):
 	def __init__(self, callback=None, read_timeout=None, write_timeout=None):
 		self.port = serial.Serial('/dev/ttyUSB0', 9600, timeout=read_timeout, writeTimeout=write_timeout)
 		if callback:
-			self.xbee = XBee(self.port, callback=callback, escaped=True)
+			self.xbee = XBee(self.port, callback=callback, escaped=False)
 			self.api = True
 		else:
 			self.api = False
